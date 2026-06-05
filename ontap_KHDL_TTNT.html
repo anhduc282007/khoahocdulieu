@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ôn Tập – Khoa Học Dữ Liệu & Trí Tuệ Nhân Tạo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--bg2:#171b24;--bg3:#1e2330;--bg4:#252a38;
+  --border:#2e3448;--border2:#3d4560;
+  --text:#e8eaf2;--text2:#9ba3be;--text3:#636b88;
+  --primary:#5b6aff;--primary2:#7481ff;--primary-bg:rgba(91,106,255,0.12);
+  --green:#22c55e;--green-bg:rgba(34,197,94,0.12);
+  --red:#ef4444;--red-bg:rgba(239,68,68,0.12);
+  --amber:#f59e0b;--amber-bg:rgba(245,158,11,0.12);
+  --radius:10px;--radius-lg:16px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;min-height:100vh;line-height:1.6}
+
+/* SCREEN MANAGEMENT */
+.screen{display:none}
+.screen.active{display:block}
+
+/* HOME */
+#home{padding:2rem 1.5rem;max-width:800px;margin:0 auto}
+.hero{text-align:center;padding:3rem 1rem 2rem}
+.hero h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#7481ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+.hero p{color:var(--text2);font-size:.95rem}
+.chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:1.5rem 0}
+.chapter-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.chapter-card:hover{border-color:var(--primary);background:var(--bg4);transform:translateY(-2px)}
+.chapter-card .cd-num{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--primary2);font-weight:500;margin-bottom:.4rem}
+.chapter-card h3{font-size:.95rem;font-weight:600;color:var(--text);line-height:1.4}
+.chapter-card .cd-count{font-size:.75rem;color:var(--text3);margin-top:.5rem}
+.chapter-card .cd-badge{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:var(--primary-bg);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--primary2)}
+.random-btn{width:100%;padding:1rem;background:linear-gradient(135deg,#5b6aff,#7c3aed);border:none;border-radius:var(--radius-lg);color:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:.5rem}
+.random-btn:hover{opacity:.9}
+.section-label{font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:1.5rem 0 .75rem}
+
+/* QUIZ */
+#quiz{display:flex;flex-direction:column;min-height:100vh}
+.quiz-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:10}
+.back-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);padding:.4rem .8rem;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:.85rem;transition:all .2s}
+.back-btn:hover{border-color:var(--border2);color:var(--text)}
+.quiz-title{font-size:.9rem;font-weight:600;flex:1}
+.quiz-meta{font-size:.8rem;color:var(--text2);font-family:'JetBrains Mono',monospace}
+.progress-bar{height:3px;background:var(--border);position:relative}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),#a78bfa);transition:width .3s;border-radius:2px}
+
+.quiz-body{flex:1;padding:1.5rem;max-width:760px;width:100%;margin:0 auto}
+.question-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem}
+.q-num{font-size:.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:.6rem}
+.q-text{font-size:1rem;font-weight:500;line-height:1.65;color:var(--text)}
+.options{display:grid;gap:8px;margin-top:1.2rem}
+.option{display:flex;align-items:flex-start;gap:.75rem;padding:.85rem 1rem;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s;text-align:left}
+.option:hover:not(.disabled){border-color:var(--primary);background:var(--primary-bg)}
+.option.selected{border-color:var(--primary);background:var(--primary-bg)}
+.option.correct{border-color:var(--green);background:var(--green-bg)}
+.option.wrong{border-color:var(--red);background:var(--red-bg)}
+.option.disabled{cursor:default}
+.opt-letter{width:26px;height:26px;min-width:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;font-family:'JetBrains Mono',monospace;color:var(--text2);transition:all .15s}
+.option.selected .opt-letter{background:var(--primary);color:#fff}
+.option.correct .opt-letter{background:var(--green);color:#fff}
+.option.wrong .opt-letter{background:var(--red);color:#fff}
+.opt-text{font-size:.9rem;line-height:1.5;color:var(--text);flex:1;padding-top:2px}
+
+.nav-area{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:1rem 0 2rem}
+.nav-btn{padding:.65rem 1.4rem;border-radius:var(--radius);font-family:'Be Vietnam Pro',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid var(--border)}
+.nav-btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.nav-btn.primary:hover{background:var(--primary2);border-color:var(--primary2)}
+.nav-btn.ghost{background:transparent;color:var(--text2)}
+.nav-btn.ghost:hover{border-color:var(--border2);color:var(--text)}
+.nav-btn:disabled{opacity:.35;cursor:not-allowed}
+
+.answered-count{font-size:.8rem;color:var(--text2);font-family:'JetBrains Mono',monospace;text-align:center;flex:1}
+
+/* RESULT */
+#result{padding:2rem 1.5rem;max-width:640px;margin:0 auto;text-align:center}
+.result-circle{width:140px;height:140px;border-radius:50%;margin:2rem auto 1.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid var(--primary);background:var(--primary-bg)}
+.result-score{font-size:2.4rem;font-weight:700;color:var(--primary2)}
+.result-label{font-size:.8rem;color:var(--text2);margin-top:.2rem}
+.result-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:1.5rem 0}
+.stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1rem .75rem}
+.stat-val{font-size:1.4rem;font-weight:600}
+.stat-key{font-size:.75rem;color:var(--text3);margin-top:.2rem}
+.stat-box.g .stat-val{color:var(--green)}
+.stat-box.r .stat-val{color:var(--red)}
+.stat-box.p .stat-val{color:var(--primary2)}
+.result-actions{display:flex;flex-direction:column;gap:10px;margin-top:1.5rem}
+.result-actions button{padding:.85rem;border-radius:var(--radius);font-family:'Be Vietnam Pro',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid var(--border)}
+.result-actions .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.result-actions .btn-primary:hover{background:var(--primary2)}
+.result-actions .btn-ghost{background:transparent;color:var(--text2)}
+.result-actions .btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+
+/* REVIEW */
+.review-section{text-align:left;margin-top:2rem}
+.review-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:10px}
+.review-item.wrong-q{border-color:rgba(239,68,68,.3)}
+.review-q{font-size:.9rem;font-weight:500;margin-bottom:.8rem;line-height:1.5}
+.review-opts{display:grid;gap:6px}
+.review-opt{display:flex;align-items:flex-start;gap:.6rem;padding:.6rem .8rem;border-radius:8px;font-size:.85rem;line-height:1.45}
+.review-opt.c-ans{background:var(--green-bg);border:1px solid rgba(34,197,94,.3)}
+.review-opt.w-sel{background:var(--red-bg);border:1px solid rgba(239,68,68,.3)}
+.review-opt.normal{border:1px solid transparent}
+.review-letter{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:600;min-width:20px;color:var(--text3)}
+.review-opt.c-ans .review-letter{color:var(--green)}
+.review-opt.w-sel .review-letter{color:var(--red)}
+.tag-wrong{font-size:.7rem;color:var(--red);background:var(--red-bg);padding:2px 8px;border-radius:20px;margin-left:.5rem;vertical-align:middle}
+.tag-correct{font-size:.7rem;color:var(--green);background:var(--green-bg);padding:2px 8px;border-radius:20px;margin-left:.5rem;vertical-align:middle}
+
+/* CHAPTER QUIZ MODE */
+.submit-btn{width:100%;padding:1rem;background:var(--primary);border:none;border-radius:var(--radius-lg);color:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:.5rem}
+.submit-btn:hover{opacity:.9}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Nav dots */
+.q-dots{display:flex;flex-wrap:wrap;gap:4px;margin:.5rem 0}
+.q-dot{width:22px;height:22px;border-radius:5px;background:var(--bg4);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--text3);transition:all .15s}
+.q-dot:hover{border-color:var(--primary2)}
+.q-dot.answered{background:var(--primary-bg);border-color:var(--primary);color:var(--primary2)}
+.q-dot.active{background:var(--primary);border-color:var(--primary);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="hero">
+    <h1>📊 Ôn Tập KHDL & TTNT</h1>
+    <p>Khoa Học Dữ Liệu &amp; Trí Tuệ Nhân Tạo · Ngân hàng câu hỏi</p>
+  </div>
+  <div class="section-label">🎲 Thi ngẫu nhiên</div>
+  <button class="random-btn" onclick="startRandom()">🎯 Tạo đề 60 câu ngẫu nhiên từ tất cả chương</button>
+  <div class="section-label" style="margin-top:2rem">📚 Ôn tập theo chương</div>
+  <div class="chapter-grid" id="chapterGrid"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="screen">
+  <div class="quiz-header">
+    <button class="back-btn" onclick="goHome()">← Trang chủ</button>
+    <div class="quiz-title" id="quizTitle">Đề ôn tập</div>
+    <div class="quiz-meta" id="quizMeta">0/0</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="quiz-body">
+    <div class="q-dots" id="qDots"></div>
+    <div id="questionArea"></div>
+    <div class="nav-area">
+      <button class="nav-btn ghost" id="prevBtn" onclick="changeQ(-1)">← Trước</button>
+      <div class="answered-count" id="answeredCount"></div>
+      <button class="nav-btn primary" id="nextBtn" onclick="handleNext()">Tiếp →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen">
+  <div class="result-circle">
+    <div class="result-score" id="resultScore">0%</div>
+    <div class="result-label">Điểm số</div>
+  </div>
+  <h2 id="resultTitle" style="font-size:1.2rem;font-weight:600;margin-bottom:.4rem"></h2>
+  <p id="resultMsg" style="color:var(--text2);font-size:.9rem"></p>
+  <div class="result-stats">
+    <div class="stat-box g"><div class="stat-val" id="r-correct">0</div><div class="stat-key">Đúng</div></div>
+    <div class="stat-box r"><div class="stat-val" id="r-wrong">0</div><div class="stat-key">Sai</div></div>
+    <div class="stat-box p"><div class="stat-val" id="r-total">0</div><div class="stat-key">Tổng câu</div></div>
+  </div>
+  <div class="result-actions">
+    <button class="btn-primary result-actions-btn" onclick="retryQuiz()">🔄 Làm lại đề này</button>
+    <button class="btn-ghost result-actions-btn" onclick="goHome()">🏠 Trang chủ</button>
+  </div>
+  <div class="review-section">
+    <div class="section-label" style="text-align:left">📋 Xem lại đáp án</div>
+    <div id="reviewList"></div>
+  </div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+  // CĐ1
+  {ch:'CĐ1',q:'Trí tuệ nhân tạo (AI) thường được định nghĩa là ngành khoa học máy tính liên quan đến điều gì?',opts:['Phát triển phần cứng máy tính tiên tiến','Tự động hóa các hành vi thông minh','Nghiên cứu về tâm lý học con người','Ứng dụng toán học trong kinh tế'],ans:1},
+  {ch:'CĐ1',q:'Mục tiêu chính của trí tuệ nhân tạo KHÔNG bao gồm điều nào sau đây?',opts:['Đưa máy móc trở nên thông minh hơn','Phục vụ lợi ích cho con người','Thay thế hoàn toàn lao động con người trong mọi lĩnh vực','Khiến máy móc phát triển hòa bình và hỗ trợ lẫn nhau với con người'],ans:2},
+  {ch:'CĐ1',q:'Theo tài liệu, các định nghĩa về AI được chia thành mấy nhóm chính?',opts:['2','3','4','5'],ans:2},
+  {ch:'CĐ1',q:'Nhóm định nghĩa AI nào tập trung vào việc xây dựng hệ thống có khả năng suy nghĩ một cách logic và hợp lý?',opts:['Các hệ thống suy nghĩ (thông minh) như con người','Các hệ thống suy nghĩ một cách hợp lý','Các hệ thống hành động (thông minh) như con người','Các hệ thống hành động một cách hợp lý'],ans:1},
+  {ch:'CĐ1',q:'Phép thử Turing được sử dụng để đánh giá điều gì?',opts:['Khả năng tính toán của máy tính','Khả năng bảo mật của hệ thống AI','Mức độ thông minh của máy tính thông qua hành vi tương tự con người','Hiệu suất của thuật toán học máy'],ans:2},
+  {ch:'CĐ1',q:'Ai là người đề xuất phép thử Turing?',opts:['John McCarthy','Alan Turing','Herbert Simon','Marvin Minsky'],ans:1},
+  {ch:'CĐ1',q:'Trong phép thử Turing, người thẩm vấn KHÔNG được phép sử dụng phương tiện giao tiếp nào sau đây?',opts:['Văn bản viết','Câu hỏi','Giọng nói','Màn hình máy tính'],ans:2},
+  {ch:'CĐ1',q:'Nhược điểm chính của phép thử Turing theo tài liệu là gì?',opts:['Quá dễ để máy tính vượt qua','Không phản ánh đầy đủ trí tuệ thực sự của máy móc, chỉ tập trung vào hành vi','Đòi hỏi người thẩm vấn phải có kiến thức chuyên sâu về AI','Chi phí thực hiện quá cao'],ans:1},
+  {ch:'CĐ1',q:'Hệ thống AI nào được xem là hệ thống giải quyết vấn đề tổng quát, mô phỏng chuỗi suy nghĩ của con người?',opts:['ELIZA','GPS (General Problem Solver)','Deep Blue','AlphaGo'],ans:1},
+  {ch:'CĐ1',q:'Cách tiếp cận "suy nghĩ hợp lý" trong AI tập trung vào việc xây dựng hệ thống dựa trên nền tảng nào?',opts:['Mạng nơ-ron nhân tạo','Logic và lập luận','Dữ liệu lớn','Mô phỏng não bộ con người'],ans:1},
+  {ch:'CĐ1',q:'Theo tài liệu, ngôn ngữ lập trình nào KHÔNG được đề cập đến như một nền tảng của AI?',opts:['Lisp','Prolog','Python','Không có đáp án đúng'],ans:2},
+  {ch:'CĐ1',q:'Giai đoạn nào được coi là "giai đoạn tiền khởi đầu" của AI?',opts:['1943-1955','1952-1969','1969-1979','1980 đến nay'],ans:0},
+  {ch:'CĐ1',q:'Sự kiện nào KHÔNG thuộc giai đoạn khởi đầu (1952-1969) của AI?',opts:['Đề xuất thuật ngữ "Trí tuệ nhân tạo"','Phát triển Perceptron','Ra đời chương trình ELIZA','Deep Blue đánh bại Garry Kasparov'],ans:3},
+  {ch:'CĐ1',q:'"Mùa đông AI" lần thứ nhất diễn ra trong khoảng thời gian nào?',opts:['1952-1969','1974-1980','1980-1988','1987-1993'],ans:1},
+  {ch:'CĐ1',q:'Nguyên nhân chính dẫn đến giai đoạn "mùa đông AI" là gì?',opts:['Thiếu kinh phí nghiên cứu từ chính phủ','Sự xuất hiện của Internet và dữ liệu lớn','Những khó khăn trong việc hiện thực hóa các dự đoán lạc quan ban đầu, "bùng nổ tổ hợp" và hạn chế của cách tiếp cận đơn giản','Cạnh tranh gay gắt giữa các nhà nghiên cứu AI'],ans:2},
+  {ch:'CĐ1',q:'Hệ thống chuyên gia (Expert Systems) trở nên phổ biến trong giai đoạn nào của lịch sử AI?',opts:['Giai đoạn khởi đầu (1952-1969)','Giai đoạn trầm lắng (1974-1980)','Hệ thống dựa trên tri thức (1969-1979)','Trí tuệ nhân tạo có sản phẩm thương mại (1980 đến nay)'],ans:2},
+  {ch:'CĐ1',q:'Chương trình máy tính nào đầu tiên đánh bại nhà vô địch cờ vua thế giới?',opts:['Logic Theorist','GPS','Deep Blue','AlphaGo'],ans:2},
+  {ch:'CĐ1',q:'Robot nào được xem là robot đầu tiên được cấp quyền công dân?',opts:['ASIMO','Shakey','Kismet','Sophia'],ans:3},
+  {ch:'CĐ1',q:'Xu hướng phát triển AI nào được nhấn mạnh từ giai đoạn 2001 đến nay?',opts:['Tập trung vào thuật toán phức tạp','Dựa trên tri thức chuyên gia','Dựa trên dữ liệu lớn và học máy','Mô phỏng hoàn toàn nhận thức con người'],ans:2},
+  {ch:'CĐ1',q:'Mô hình ngôn ngữ tự nhiên GPT-3 được phát hành vào năm nào?',opts:['2019','2020','2022','2023'],ans:1},
+  // CĐ2
+  {ch:'CĐ2',q:'Khoa học dữ liệu là gì?',opts:['Một lĩnh vực nghiên cứu về toán học và thống kê','Một lĩnh vực nghiên cứu về dữ liệu và cách khai thác thông tin từ chúng','Một ngành khoa học chỉ liên quan đến máy tính','Một ngành khoa học chỉ sử dụng các phương pháp nghiên cứu lý thuyết'],ans:1},
+  {ch:'CĐ2',q:'Dữ liệu nào dưới đây được xem là dữ liệu có cấu trúc?',opts:['Video đánh giá sản phẩm','Email (người gửi, người nhận, nội dung)','Lịch sử giao dịch của khách hàng (ngày, sản phẩm, số tiền)','Bài đăng trên mạng xã hội'],ans:2},
+  {ch:'CĐ2',q:'Kỹ thuật nào dưới đây không phải là phương pháp phân tích dữ liệu không cấu trúc?',opts:['Xử lý ngôn ngữ tự nhiên (NLP)','Phân tích hồi quy','Thị giác máy tính','Chuyển đổi giọng nói thành văn bản'],ans:1},
+  {ch:'CĐ2',q:'Đâu là dữ liệu không cấu trúc?',opts:['Cơ sở dữ liệu khách hàng','Bài đăng trên mạng xã hội','Dữ liệu giao dịch','Dữ liệu nhân sự'],ans:1},
+  {ch:'CĐ2',q:'Các nhà khoa học dữ liệu cần kết hợp các kỹ năng nào để phân tích dữ liệu hiệu quả?',opts:['Chỉ cần kỹ năng lập trình','Kỹ năng lập trình, kiến thức toán học và thống kê, kiến thức chuyên ngành','Kỹ năng giao tiếp và kỹ năng quản lý dự án','Kiến thức về dữ liệu và kỹ năng bán hàng'],ans:1},
+  {ch:'CĐ2',q:'Dữ liệu nào dưới đây được coi là dữ liệu sơ cấp?',opts:['Dữ liệu đã được thu thập từ nghiên cứu trước đó','Dữ liệu có sẵn từ các báo cáo nghiên cứu','Dữ liệu lấy từ các nguồn công cộng trên internet','Dữ liệu do chính người nghiên cứu làm thí nghiệm xác định được'],ans:3},
+  {ch:'CĐ2',q:'Dữ liệu trùng lặp có thể gây ra vấn đề gì trong phân tích dữ liệu?',opts:['Làm tăng độ phức tạp tính toán và thời gian xử lý','Tăng độ chính xác của mô hình','Tăng tốc độ học tập của mô hình','Tăng khả năng phân tích dữ liệu'],ans:0},
+  {ch:'CĐ2',q:'Đâu không phải là phương pháp xử lý dữ liệu thiếu?',opts:['Loại bỏ toàn bộ cột chứa giá trị thiếu','Điền giá trị thiếu bằng giá trị trung bình của cột','Điền một giá trị ngẫu nhiên vào vị trí giá trị thiếu','Loại bỏ toàn bộ hàng chứa giá trị thiếu'],ans:2},
+  {ch:'CĐ2',q:'Phương pháp nào không được sử dụng để xử lý dữ liệu ngoại lai?',opts:['Loại bỏ các giá trị ngoại lai nếu không có giá trị thông tin','Điền giá trị ngoại lai bằng giá trị trung bình của dữ liệu','Tách các giá trị ngoại lai ra thành nhóm riêng biệt','Điền giá trị ngoại lai bằng giá trị lớn nhất của dữ liệu'],ans:3},
+  {ch:'CĐ2',q:'Loại biểu đồ nào thường được dùng để kiểm tra mối quan hệ giữa 2 biến liên tục nhằm phát hiện mối liên hệ tuyến tính hoặc phi tuyến?',opts:['Biểu đồ phân tán (Scatter plot)','Biểu đồ tần suất (Histogram)','Biểu đồ tương quan (Correlogram)','Biểu đồ hộp (Boxplot)'],ans:0},
+  {ch:'CĐ2',q:'Khai phá dữ liệu được hiểu như thế nào là đúng?',opts:['Quá trình thu thập dữ liệu từ nhiều nguồn khác nhau','Quá trình làm sạch và chuẩn hóa dữ liệu','Quá trình tìm kiếm thông tin hữu ích từ dữ liệu','Quá trình lưu trữ và quản lý dữ liệu'],ans:2},
+  {ch:'CĐ2',q:'Kỹ thuật nào sau đây không phải là kỹ thuật khai phá dữ liệu?',opts:['Phân lớp (Classification)','Hồi quy (Regression)','Trực quan hóa (Visualization)','Gom cụm (Clustering)'],ans:2},
+  {ch:'CĐ2',q:'Công cụ nào sau đây thường được sử dụng trong khai phá dữ liệu?',opts:['Microsoft Word','Adobe Photoshop','Python','Google Chrome'],ans:2},
+  {ch:'CĐ2',q:'Biện pháp nào sau đây giúp bảo vệ dữ liệu khỏi tấn công mạng?',opts:['Sao lưu dữ liệu định kỳ','Mã hóa dữ liệu','Phân quyền truy cập','Tất cả các đáp án trên'],ans:3},
+  {ch:'CĐ2',q:'Hệ quản trị CSDL (DBMS) có vai trò nào phù hợp nhất?',opts:['Tạo ra dữ liệu','Phân tích dữ liệu','Quản lý và đảm bảo an toàn cho dữ liệu','Thu thập dữ liệu từ internet'],ans:2},
+  {ch:'CĐ2',q:'Khóa chính trong CSDL quan hệ có đặc điểm gì là đúng?',opts:['Có thể trùng lặp','Xác định duy nhất một bản ghi','Không bắt buộc','Luôn là số tự động tăng'],ans:1},
+  {ch:'CĐ2',q:'Trong cơ sở dữ liệu quan hệ, khóa ngoại (foreign key) được sử dụng để:',opts:['Xác định duy nhất một bản ghi trong một bảng','Liên kết một bảng với chính nó','Tham chiếu đến khóa chính của một bảng khác','Tạo chỉ mục cho bảng'],ans:2},
+  {ch:'CĐ2',q:'Chỉ mục trong CSDL có tác dụng gì?',opts:['Tăng tốc độ truy vấn','Giảm dung lượng lưu trữ','Mã hóa dữ liệu','Phân quyền truy cập'],ans:0},
+  {ch:'CĐ2',q:'Phương pháp nào sau đây không được đề cập trong nội dung bảo mật dữ liệu?',opts:['Mã hóa dữ liệu','Quản lý quyền truy cập','Sao lưu và phục hồi dữ liệu','Nén dữ liệu'],ans:3},
+  {ch:'CĐ2',q:'Ngôn ngữ SQL dùng để làm gì?',opts:['Lập trình web','Thiết kế giao diện','Thao tác với CSDL quan hệ','Phân tích dữ liệu'],ans:2},
+  // CĐ3
+  {ch:'CĐ3',q:'Thư viện nào sau đây trong Python được sử dụng để xử lý dữ liệu dạng bảng?',opts:['NumPy','Pandas','Matplotlib','Seaborn'],ans:1},
+  {ch:'CĐ3',q:'Bước nào sau đây không phải là bước trong quy trình phân tích dữ liệu?',opts:['Hiểu vấn đề','Thu thập dữ liệu','Xây dựng mô hình','Trình bày kết quả'],ans:1},
+  {ch:'CĐ3',q:'Kỹ thuật nào sau đây được sử dụng trong phân tích dự đoán?',opts:['Tính toán các thống kê mô tả','Sử dụng các mô hình học máy','Phân tích mối quan hệ giữa các biến','Tìm hiểu nguyên nhân dẫn đến một sự kiện'],ans:1},
+  {ch:'CĐ3',q:'Framework nào sau đây được phát triển bởi Google?',opts:['TensorFlow','PyTorch','Spark','Hadoop'],ans:0},
+  {ch:'CĐ3',q:'Google Colab là gì?',opts:['Ngôn ngữ lập trình','Thư viện Python','Nền tảng đám mây','Môi trường lập trình cục bộ'],ans:2},
+  {ch:'CĐ3',q:'Lệnh nào sau đây được sử dụng để cài đặt thư viện trong Google Colab?',opts:['!pip install','!conda install','!install.packages','!apt-get install'],ans:0},
+  {ch:'CĐ3',q:'Ưu điểm của việc sử dụng Google Colab là gì?',opts:['Miễn phí','Hỗ trợ GPU/TPU','Dễ dàng chia sẻ','Tất cả các đáp án trên'],ans:3},
+  {ch:'CĐ3',q:'Thư viện NumPy trong Python được sử dụng để làm gì?',opts:['Xử lý dữ liệu dạng bảng','Tính toán hiệu quả','Trực quan hóa dữ liệu','Xây dựng mô hình học máy'],ans:1},
+  {ch:'CĐ3',q:'Thư viện Seaborn trong Python được sử dụng để làm gì?',opts:['Xử lý dữ liệu dạng bảng','Tính toán hiệu quả','Trực quan hóa dữ liệu nâng cao','Xây dựng mô hình học máy'],ans:2},
+  {ch:'CĐ3',q:'Pandas hỗ trợ thao tác với dữ liệu dạng bảng (DataFrame) và chuỗi thời gian (Series) – nhận định này:',opts:['Đúng','Sai','Chỉ đúng với DataFrame','Chỉ đúng với Series'],ans:0},
+  // CĐ4
+  {ch:'CĐ4',q:'K-means là thuật toán thuộc loại nào?',opts:['Học có giám sát','Học không giám sát','Học tăng cường','Học sâu'],ans:1},
+  {ch:'CĐ4',q:'Hồi quy Logistic thường được sử dụng cho bài toán nào?',opts:['Phân loại nhị phân','Phân loại đa lớp','Hồi quy','Phân cụm'],ans:0},
+  {ch:'CĐ4',q:'Phân tích kết quả bao gồm những hoạt động nào?',opts:['So sánh với kết quả thực tế','Đánh giá mô hình dựa trên các chỉ số','Cả A và B','Không có đáp án đúng'],ans:2},
+  {ch:'CĐ4',q:'Vấn đề quá khớp (Overfitting) xảy ra khi nào?',opts:['Mô hình học quá chi tiết trên tập huấn luyện, kém hiệu quả trên dữ liệu mới','Mô hình không đủ phức tạp để nắm bắt các quy luật trong dữ liệu','Cả A và B','Không có đáp án đúng'],ans:0},
+  {ch:'CĐ4',q:'Độ chính xác (accuracy) là chỉ số đánh giá hiệu suất mô hình cho bài toán nào?',opts:['Phân loại','Hồi quy','Cả A và B','Không có đáp án đúng'],ans:0},
+  {ch:'CĐ4',q:'Sai số bình phương trung bình (MSE) là chỉ số đánh giá hiệu suất mô hình cho bài toán nào?',opts:['Phân loại','Hồi quy','Cả A và B','Không có đáp án đúng'],ans:1},
+  {ch:'CĐ4',q:'K láng giềng gần nhất (KNN) là thuật toán thuộc loại nào?',opts:['Học có giám sát','Học không giám sát','Học tăng cường','Học sâu'],ans:0},
+  {ch:'CĐ4',q:'Ý tưởng chính của SVM là gì?',opts:['Tìm một siêu phẳng tối ưu để phân tách dữ liệu','Xây dựng một cây quyết định','Sử dụng mạng nơ-ron','Không có đáp án đúng'],ans:0},
+  {ch:'CĐ4',q:'Mạng nơ-ron tích chập (CNN) được thiết kế đặc biệt để xử lý dữ liệu nào?',opts:['Dữ liệu văn bản','Dữ liệu hình ảnh','Dữ liệu âm thanh','Dữ liệu chuỗi thời gian'],ans:1},
+  {ch:'CĐ4',q:'Hàm kích hoạt (Activation Function) có vai trò gì trong mạng nơ-ron nhân tạo?',opts:['Quyết định tín hiệu nào sẽ được truyền qua mạng','Tính toán sai số giữa đầu ra dự đoán và giá trị thực tế','Điều chỉnh trọng số','Tất cả các đáp án trên'],ans:3},
+  // CĐ8
+  {ch:'CĐ8',q:'Vai trò chính của Kỹ sư câu lệnh là gì?',opts:['Tạo ra các ứng dụng di động','Quản lý cơ sở dữ liệu của doanh nghiệp','Thiết kế và tối ưu hóa câu lệnh nhằm giúp LLMs thực hiện tác vụ chính xác theo yêu cầu của người dùng','Phát triển phần cứng cho máy tính'],ans:2},
+  {ch:'CĐ8',q:'Trong việc xây dựng câu lệnh, việc xác định mục tiêu và ngữ cảnh có tác dụng?',opts:['Giúp mô hình tính toán nhanh hơn','Xác định rõ ràng yêu cầu và điều chỉnh giọng văn, định dạng cho phù hợp với đối tượng sử dụng','Giảm chi phí phần cứng','Tăng tốc độ truy vấn cơ sở dữ liệu'],ans:1},
+  {ch:'CĐ8',q:'Trong quá trình xây dựng câu lệnh, bước đầu tiên cần thực hiện là gì?',opts:['Lựa chọn từ khóa và cấu trúc câu lệnh','Đánh giá kết quả đầu ra','Thử nghiệm với mô hình','Xác định mục tiêu và ngữ cảnh của câu lệnh'],ans:3},
+  {ch:'CĐ8',q:'Trong xây dựng câu lệnh, "từ khóa" được xem là gì?',opts:['Phần mở đầu của câu lệnh','Tên gọi của các mô hình ngôn ngữ lớn','Công cụ đo lường hiệu suất của mô hình','Thành phần giúp mô hình xác định yêu cầu cần thực hiện'],ans:3},
+  {ch:'CĐ8',q:'Cấu trúc câu lệnh hiệu quả nên bao gồm những thành phần nào sau đây?',opts:['Chỉ dẫn, chủ đề/nội dung, định dạng yêu cầu và thông tin ngữ cảnh','Tên người dùng, mật khẩu và địa chỉ IP','Các lệnh SQL cơ bản','Hình ảnh và video minh họa'],ans:0},
+  {ch:'CĐ8',q:'Trong quá trình tối ưu hóa câu lệnh, "constraint prompting" nhằm mục đích gì?',opts:['Tăng độ ngẫu nhiên của kết quả','Đặt ra các ràng buộc hoặc giới hạn cho kết quả đầu ra như độ dài, định dạng hay các từ khóa cụ thể','Loại bỏ hoàn toàn các từ khóa không cần thiết','Tạo các câu lệnh ngắn gọn mà không cần thông tin bổ sung'],ans:1},
+  {ch:'CĐ8',q:'Tác dụng của việc sử dụng "few-shot prompting" là gì?',opts:['Giảm chi phí tính toán','Tăng thời gian xử lý của mô hình','Cung cấp các ví dụ mẫu giúp mô hình hiểu rõ định dạng và phong cách mong muốn','Giảm số lượng từ khóa cần sử dụng'],ans:2},
+  {ch:'CĐ8',q:'Tại sao kỹ năng Prompt Engineering trở thành "kỹ năng không thể thiếu" trong kỷ nguyên AI?',opts:['Vì nó giúp giảm chi phí phần cứng','Vì nó là cầu nối giữa con người và các mô hình ngôn ngữ lớn, tối ưu hóa hiệu suất và độ chính xác của ứng dụng AI','Vì nó thay thế hoàn toàn việc sử dụng ngôn ngữ tự nhiên','Vì nó đảm bảo an ninh mạng cho doanh nghiệp'],ans:1},
+  {ch:'CĐ8',q:'Trong lĩnh vực Prompt Engineering, "role prompting" đề cập đến kỹ thuật nào?',opts:['Sử dụng các tham số kỹ thuật để tăng độ chính xác của mô hình','Yêu cầu mô hình đóng vai một nhân vật cụ thể để điều chỉnh phong cách và giọng văn của câu trả lời','Sử dụng công cụ quản lý và lưu trữ các câu lệnh','Tạo ra các câu lệnh ngẫu nhiên để kiểm tra hiệu quả mô hình'],ans:1},
+  {ch:'CĐ8',q:'Tại sao việc cung cấp đầy đủ ngữ cảnh cho câu lệnh lại quan trọng khi tương tác với mô hình ngôn ngữ?',opts:['Giúp mô hình giảm độ phức tạp trong quá trình tính toán','Giúp mô hình tăng tốc độ xử lý dữ liệu','Giúp mô hình hiểu rõ đối tượng, mục đích và yêu cầu cụ thể của tác vụ','Giúp mô hình tránh được lỗi kỹ thuật trong quá trình huấn luyện'],ans:2},
+  // CĐ9
+  {ch:'CĐ9',q:'Prompt Engineer đóng vai trò gì trong việc khai thác sức mạnh của mô hình ngôn ngữ lớn?',opts:['Quản lý tài chính dự án','Thiết kế và tối ưu hóa câu lệnh','Bảo trì phần cứng máy tính','Phân tích đối thủ cạnh tranh'],ans:1},
+  {ch:'CĐ9',q:'Loại hình sáng tạo văn bản nào mà Prompt Engineer có thể thực hiện?',opts:['Thiết kế đồ họa','Lập trình web','Quản lý dự án','Kể chuyện'],ans:3},
+  {ch:'CĐ9',q:'Khi viết kịch bản phim, Prompt Engineer có thể hỗ trợ những gì?',opts:['Chọn diễn viên','Thiết kế âm thanh','Viết lời thoại nhân vật','Quản lý ngân sách'],ans:2},
+  {ch:'CĐ9',q:'Trong nội dung quảng cáo, Prompt Engineer có thể tạo ra những gì?',opts:['Video quảng cáo','Poster quảng cáo','Slogan, tagline','Nhạc quảng cáo'],ans:2},
+  {ch:'CĐ9',q:'Kỹ thuật Prompt Engineering nào giúp mô hình tạo ra câu chuyện mạch lạc?',opts:['Giới hạn độ dài','Ràng buộc về từ ngữ','Thiết lập bối cảnh và nhân vật','Chỉ định giọng văn'],ans:2},
+  {ch:'CĐ9',q:'Điều gì cần cung cấp để mô hình viết theo phong cách của một tác giả nổi tiếng?',opts:['Mô tả nhân vật','Yêu cầu phong cách cụ thể','Xây dựng tình huống khởi đầu','Giới hạn độ dài'],ans:1},
+  {ch:'CĐ9',q:'Loại ràng buộc nào kích thích sáng tạo khi tạo văn bản?',opts:['Giới hạn độ dài','Thiết lập bối cảnh','Mô tả nhân vật','Chỉ định giọng văn'],ans:0},
+  {ch:'CĐ9',q:'Kỹ thuật nào hướng dẫn mô hình đóng vai một nhân vật cụ thể?',opts:['Sử dụng ràng buộc','Cung cấp thông tin nền','Giới hạn độ dài','Giao vai'],ans:3},
+  {ch:'CĐ9',q:'Trong dịch thuật, điều gì cần xác định rõ trong câu lệnh cơ bản nhất?',opts:['Phong cách dịch','Ngôn ngữ nguồn và ngôn ngữ đích','Lĩnh vực chuyên ngành','Ngữ cảnh'],ans:1},
+  {ch:'CĐ9',q:'Để có bản dịch phù hợp với ngữ cảnh, có thể chỉ định điều gì?',opts:['Phong cách','Độ dài văn bản','Số lượng từ','Kích thước font chữ'],ans:0},
+  {ch:'CĐ9',q:'Khi dịch văn bản chuyên ngành, điều gì giúp cải thiện độ chính xác?',opts:['Sử dụng phong cách thân mật','Giới hạn số lượng từ','Cung cấp thêm ngữ cảnh hoặc từ khóa chuyên ngành','Dịch lặp đi lặp lại'],ans:2},
+  {ch:'CĐ9',q:'Mục đích của tóm tắt văn bản là gì?',opts:['Làm ngắn văn bản','Thay đổi ý nghĩa của văn bản','Rút gọn văn bản nhưng vẫn giữ thông tin quan trọng','Thêm thông tin mới vào văn bản'],ans:2},
+  {ch:'CĐ9',q:'Điều gì có thể yêu cầu khi chỉ định độ dài tóm tắt?',opts:['Số lượng hình ảnh','Số lượng tiêu đề','Số từ, số câu, hoặc tỷ lệ phần trăm so với văn bản gốc','Kích thước font chữ'],ans:2},
+  {ch:'CĐ9',q:'Loại tóm tắt nào tập trung vào những ý tưởng quan trọng nhất?',opts:['Tóm tắt khái quát','Tóm tắt tập trung vào ý chính','Tóm tắt theo chủ đề','Tóm tắt trích đoạn'],ans:1},
+  {ch:'CĐ9',q:'Ứng dụng nào của tóm tắt văn bản giúp nắm bắt ý chính nhanh chóng?',opts:['Tạo nội dung dài','Xử lý thông tin quá tải','Viết sách','Soạn email'],ans:1},
+  {ch:'CĐ9',q:'Trong phân tích dữ liệu, Prompt Engineer có thể yêu cầu mô hình làm gì?',opts:['Thiết kế giao diện người dùng','Lập trình ứng dụng','Phân tích cảm xúc','Quản lý dự án'],ans:2},
+  // CĐ10
+  {ch:'CĐ10',q:'Bạn muốn AI tóm tắt bài báo về biến đổi khí hậu nhưng chỉ giữ lại những thông tin quan trọng nhất. Đâu là phương án điều chỉnh prompt hợp lý?',opts:['Thêm yêu cầu về độ dài của bản tóm tắt','Bỏ qua việc đề cập đến nội dung cần tóm tắt','Yêu cầu AI tạo một bài viết mới thay vì tóm tắt','Thêm các từ khóa ngẫu nhiên vào prompt'],ans:0},
+  {ch:'CĐ10',q:'Bạn muốn trích xuất danh sách các tên công ty từ một đoạn văn bản dài. Prompt nào phù hợp nhất?',opts:['Hãy viết một đoạn văn có nhắc đến nhiều công ty','Trích xuất danh sách tên các công ty xuất hiện trong văn bản sau','Tóm tắt đoạn văn bản dưới đây','Dịch đoạn văn bản sang tiếng Anh'],ans:1},
+  {ch:'CĐ10',q:'Bạn cần dịch một đoạn văn từ tiếng Việt sang tiếng Anh nhưng muốn giữ nguyên các thuật ngữ chuyên ngành. Bạn nên bổ sung điều gì vào prompt?',opts:['Dịch đoạn văn sang tiếng Anh, đảm bảo sử dụng ngôn ngữ tự nhiên','Dịch đoạn văn sang tiếng Anh, giữ nguyên các thuật ngữ chuyên ngành','Tóm tắt đoạn văn trước khi dịch sang tiếng Anh','Dịch đoạn văn nhưng thay thế tất cả các thuật ngữ chuyên ngành bằng từ đồng nghĩa đơn giản hơn'],ans:1},
+  {ch:'CĐ10',q:'Bạn muốn AI trích xuất các ngày tháng quan trọng từ một đoạn văn bản lịch sử. Điều gì cần có trong prompt để đạt hiệu quả tốt nhất?',opts:['Chỉ yêu cầu AI đọc đoạn văn bản mà không đưa ra yêu cầu cụ thể','Yêu cầu AI trích xuất tất cả các số có trong văn bản','Hãy trích xuất tất cả các ngày tháng quan trọng có trong đoạn văn bản lịch sử sau','Dịch đoạn văn bản lịch sử sang tiếng Anh'],ans:2},
+  {ch:'CĐ10',q:'Một prompt hiệu quả thường có các thành phần chính nào?',opts:['Ngữ cảnh, hướng dẫn cụ thể, ví dụ minh họa (nếu cần) và định dạng đầu ra mong muốn','Chỉ cần một câu lệnh ngắn gọn, không cần chi tiết thêm','Dùng càng nhiều từ khóa ngẫu nhiên càng tốt để AI hiểu rõ hơn','Chỉ cung cấp một đoạn văn bản mà không có yêu cầu rõ ràng'],ans:0},
+  {ch:'CĐ10',q:'Khi viết prompt để trích xuất thông tin từ văn bản, điều gì quan trọng nhất để có kết quả chính xác?',opts:['Nêu rõ loại thông tin cần trích xuất và định dạng mong muốn','Yêu cầu AI đọc văn bản mà không nói rõ thông tin cần trích xuất','Cung cấp một danh sách các câu hỏi chung chung','Chỉ yêu cầu tóm tắt văn bản thay vì trích xuất thông tin cụ thể'],ans:0},
+  {ch:'CĐ10',q:'Prompt "Tóm tắt bài báo về nghiên cứu vật liệu mới trong lĩnh vực xây dựng dân dụng. Hãy tập trung vào các phương pháp nghiên cứu, kết quả thu được và ứng dụng của các phương pháp đó trong thực tế." áp dụng kỹ thuật nào?',opts:['Thêm ví dụ','Chia nhỏ tác vụ','Giao vai','Ràng buộc'],ans:3},
+  {ch:'CĐ10',q:'Đoạn prompt "Tóm tắt sách về khoa học dữ liệu." thiếu phần nào để tối ưu hóa?',opts:['Thiếu yêu cầu về độ dài của bản tóm tắt','Thiếu thông tin về đối tượng người đọc','Thiếu thông tin về các phần cần tóm tắt','Cả A, B và C đều đúng'],ans:3},
+  {ch:'CĐ10',q:'Prompt "Tóm tắt bài báo nghiên cứu về biến đổi khí hậu. Đầu tiên, nêu các điểm chính của bài báo, sau đó trình bày các kết luận và khuyến nghị." sử dụng kỹ thuật gì?',opts:['Thêm ví dụ','Chia nhỏ tác vụ','Giao vai','Ràng buộc'],ans:1},
+  {ch:'CĐ10',q:'Kỹ thuật nào được sử dụng trong prompt: "Giả sử bạn là một nhà nghiên cứu chuyên về y học, viết một báo cáo về tác động của thuốc đối với bệnh nhân tiểu đường."?',opts:['Thêm ví dụ','Chia nhỏ tác vụ','Giao vai','Ràng buộc'],ans:2},
+  // CĐ12
+  {ch:'CĐ12',q:'Bước đầu tiên trong quy trình thực hiện một dự án AI đơn giản là gì?',opts:['Thu thập dữ liệu','Lựa chọn bài toán','Xây dựng mô hình','Đánh giá mô hình'],ans:1},
+  {ch:'CĐ12',q:'Thư viện nào sau đây thường được sử dụng để triển khai các mô hình AI?',opts:['Microsoft Word','Adobe Photoshop','TensorFlow','Google Chrome'],ans:2},
+  {ch:'CĐ12',q:'Mục đích chính của việc tối ưu hóa siêu tham số trong mô hình AI là gì?',opts:['Giảm thời gian huấn luyện mô hình','Cải thiện hiệu suất của mô hình','Giảm kích thước của mô hình','Tăng khả năng giải thích của mô hình'],ans:1},
+  {ch:'CĐ12',q:'Chỉ số nào sau đây thường được sử dụng để đánh giá hiệu suất của mô hình hồi quy?',opts:['Lỗi trung bình bình phương (MSE)','Hệ số xác định (R2)','Lỗi tuyệt đối trung bình (MAE)','Tất cả các đáp án trên'],ans:3},
+  {ch:'CĐ12',q:'Khi nào nên sử dụng học không giám sát trong dự án AI?',opts:['Khi dữ liệu đã được gán nhãn','Khi cần dự đoán một giá trị liên tục','Khi dữ liệu chưa được gán nhãn','Khi cần huấn luyện robot'],ans:2},
+  {ch:'CĐ12',q:'Việc làm sạch dữ liệu trong quá trình chuẩn bị dữ liệu cho dự án AI nhằm mục đích gì?',opts:['Tăng kích thước của dữ liệu','Loại bỏ các vấn đề không mong muốn trong dữ liệu','Chuyển đổi dữ liệu thành dạng hình ảnh','Giảm chi phí lưu trữ dữ liệu'],ans:1},
+  {ch:'CĐ12',q:'Kỹ thuật One-Hot Encoding thường được sử dụng để làm gì trong quá trình chuẩn bị dữ liệu?',opts:['Chuẩn hóa dữ liệu số','Mã hóa biến phân loại','Xử lý giá trị thiếu','Loại bỏ giá trị ngoại lai'],ans:1},
+  {ch:'CĐ12',q:'Tập dữ liệu kiểm định (validation set) được sử dụng để làm gì?',opts:['Điều chỉnh siêu tham số và giảm thiểu nguy cơ quá khớp','Huấn luyện mô hình','Đánh giá hiệu suất cuối cùng của mô hình','So sánh hiệu suất của các mô hình khác nhau'],ans:0},
+  {ch:'CĐ12',q:'Trong quá trình xây dựng mô hình AI, việc lựa chọn thuật toán phụ thuộc vào yếu tố nào?',opts:['Ngôn ngữ lập trình','Loại bài toán','Thời gian thực hiện','Kinh nghiệm của người xây dựng'],ans:1},
+  {ch:'CĐ12',q:'Mục đích của việc lưu trữ mô hình AI đã huấn luyện là gì?',opts:['Giảm kích thước của mô hình','Tái sử dụng mô hình cho các dự án khác','Chia sẻ mô hình với người dùng khác','Bảo vệ mô hình khỏi các cuộc tấn công mạng'],ans:1},
+  {ch:'CĐ12',q:'Để trực quan hóa kết quả dự đoán của mô hình AI, có thể sử dụng công cụ nào sau đây?',opts:['Microsoft Excel','Biểu đồ phân tán','Máy tính cầm tay','Notepad'],ans:1},
+  {ch:'CĐ12',q:'Tại sao cần so sánh hiệu suất trên tập kiểm tra và tập kiểm định?',opts:['Để xác định thời gian huấn luyện mô hình','Để tính toán chi phí xây dựng mô hình','Để kiểm tra khả năng tổng quát hóa của mô hình','Để lựa chọn siêu tham số tốt nhất'],ans:2},
+  {ch:'CĐ12',q:'Phân tích các trường hợp dự đoán sai của mô hình AI giúp ích gì?',opts:['Tăng tốc độ huấn luyện mô hình','Giảm kích thước của mô hình','Hiểu rõ giới hạn và nguyên nhân gây ra lỗi','Tự động điều chỉnh siêu tham số'],ans:2},
+  {ch:'CĐ12',q:'Khi trình bày dự án AI, điều gì là quan trọng nhất?',opts:['Sử dụng nhiều thuật ngữ chuyên ngành','Truyền đạt rõ ràng mục tiêu, phương pháp và kết quả','Trình bày tất cả các chi tiết kỹ thuật','Thuyết trình với tốc độ nhanh'],ans:1},
+  {ch:'CĐ12',q:'Mục đích của việc đề xuất hướng phát triển tiếp theo cho dự án AI là gì?',opts:['Kéo dài thời gian thực hiện dự án','Tăng số lượng người tham gia dự án','Giảm bớt trách nhiệm của nhóm phát triển','Cải thiện hoặc mở rộng ứng dụng của mô hình'],ans:3},
+  // CĐ13
+  {ch:'CĐ13',q:'Bước đầu tiên trong quy trình thực hiện một dự án AI là gì?',opts:['Xây dựng mô hình','Thu thập dữ liệu','Tư duy bài toán','Trình bày dự án'],ans:2},
+  {ch:'CĐ13',q:'Việc xác định rõ ràng vấn đề cần giải quyết trong dự án AI giúp ích gì?',opts:['Tăng tốc độ xử lý dữ liệu','Giảm chi phí thực hiện dự án','Đảm bảo dự án đi đúng hướng và đạt được kết quả mong muốn','Loại bỏ hoàn toàn các rủi ro trong dự án'],ans:2},
+  {ch:'CĐ13',q:'Phân tích các yếu tố ảnh hưởng đến bài toán AI bao gồm những yếu tố nào?',opts:['Bao gồm dữ liệu đầu vào','Bao gồm các ràng buộc về kỹ thuật','Bao gồm các yêu cầu từ phía người dùng','Bao gồm dữ liệu, kỹ thuật, con người và các yêu cầu từ phía người dùng'],ans:3},
+  {ch:'CĐ13',q:'Học tăng cường thường được sử dụng trong những bài toán AI nào?',opts:['Phân loại hình ảnh','Dự đoán giá nhà','Tối ưu hóa hành động trong môi trường tương tác','Phân cụm dữ liệu'],ans:2},
+  {ch:'CĐ13',q:'Mục đích của việc đặt ra các câu hỏi cụ thể trong quá trình tư duy bài toán là gì?',opts:['Làm tăng độ phức tạp của dự án','Làm rõ mục tiêu và hướng dẫn quá trình thực hiện dự án','Giảm bớt khối lượng công việc','Tránh việc phải thu thập dữ liệu'],ans:1},
+  {ch:'CĐ13',q:'Việc chia nhỏ bài toán thành các bước cụ thể giúp ích gì?',opts:['Tăng tính phức tạp của dự án','Giảm bớt độ phức tạp và tạo điều kiện phân công nhiệm vụ','Tăng sự sáng tạo trong dự án','Kéo dài thời gian thực hiện dự án'],ans:1},
+  {ch:'CĐ13',q:'Nền tảng nào sau đây thường được sử dụng để quản lý mã nguồn trong dự án AI?',opts:['Microsoft Word','Zoom','Google Drive','GitHub'],ans:3},
+  {ch:'CĐ13',q:'Tầm quan trọng của việc duy trì tính đồng bộ giữa các thành viên trong nhóm là gì?',opts:['Tạo ra sự cạnh tranh giữa các thành viên','Giảm bớt trách nhiệm của trưởng nhóm','Đảm bảo sự phối hợp hiệu quả và tiến độ của dự án','Hạn chế việc trao đổi thông tin giữa các thành viên'],ans:2},
+  {ch:'CĐ13',q:'Trong quá trình trình bày dự án AI, điều gì là quan trọng nhất?',opts:['Sử dụng nhiều hiệu ứng động trong slide','Truyền đạt rõ ràng kết quả và giá trị của dự án','Thuyết trình truyền cảm','Không trình bày những hạn chế của dự án'],ans:1},
+  {ch:'CĐ13',q:'Thảo luận về điểm mạnh và điểm yếu của dự án AI giúp ích gì?',opts:['Làm tăng thời gian thuyết trình','Nhận diện những khía cạnh cần cải thiện và phát triển dự án','Tăng sự tự tin của nhóm phát triển','Tạo ra tranh luận sôi nổi giữa các thành viên'],ans:1},
+  {ch:'CĐ13',q:'Tại sao cần thu thập ý kiến phản hồi sau khi trình bày dự án AI?',opts:['Để đánh giá mức độ hài lòng của khán giả','Để khen ngợi nhóm phát triển','Để hoàn thiện và cải thiện dự án','Để so sánh với các dự án khác'],ans:2},
+  {ch:'CĐ13',q:'Công cụ nào sau đây có thể được sử dụng để trực quan hóa kết quả của dự án AI?',opts:['Máy tính cầm tay','Biểu đồ','Bảng tính','Notepad'],ans:1},
+  {ch:'CĐ13',q:'Khi trình bày dự án AI, nên sử dụng ngôn ngữ như thế nào?',opts:['Ngôn ngữ chuyên ngành, phức tạp hóa','Ngôn ngữ dễ hiểu, rõ ràng','Ngôn ngữ mang tính chất quảng cáo','Ngôn ngữ tương đối chính xác'],ans:1},
+  {ch:'CĐ13',q:'Mục đích của việc trình bày dự án AI là gì?',opts:['Để đánh giá kết quả học tập của sinh viên','Để truyền đạt kết quả và giá trị của dự án đến người nghe','Để quảng bá sản phẩm AI','Để hoàn thành dự án'],ans:1},
+  {ch:'CĐ13',q:'Thái độ nào sau đây là quan trọng nhất khi thực hiện một dự án AI?',opts:['Tự do cá nhân','Tinh thần hợp tác','Lạc quan','Giữ nguyên quan điểm cá nhân'],ans:1},
+];
+
+const CHAPTERS = [
+  {id:'CĐ1',name:'Chuyên đề 1',desc:'Giới thiệu về Trí tuệ Nhân tạo'},
+  {id:'CĐ2',name:'Chuyên đề 2',desc:'Khoa học Dữ liệu & CSDL'},
+  {id:'CĐ3',name:'Chuyên đề 3',desc:'Công cụ & Thư viện Python'},
+  {id:'CĐ4',name:'Chuyên đề 4',desc:'Học máy & Mô hình AI'},
+  {id:'CĐ8',name:'Chuyên đề 8',desc:'Prompt Engineering cơ bản'},
+  {id:'CĐ9',name:'Chuyên đề 9',desc:'Ứng dụng Prompt Engineering'},
+  {id:'CĐ10',name:'Chuyên đề 10',desc:'Tối ưu hóa Prompt'},
+  {id:'CĐ12',name:'Chuyên đề 12',desc:'Dự án AI – Triển khai'},
+  {id:'CĐ13',name:'Chuyên đề 13',desc:'Dự án AI – Tư duy & Trình bày'},
+];
+
+let currentQuestions = [];
+let userAnswers = [];
+let currentIdx = 0;
+let quizMode = ''; // 'random' | 'chapter'
+let lastQuestions = [];
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+
+function buildHome(){
+  const grid = document.getElementById('chapterGrid');
+  grid.innerHTML = CHAPTERS.map((c,i)=>{
+    const qs = ALL_QUESTIONS.filter(q=>q.ch===c.id);
+    return `<div class="chapter-card" onclick="startChapter('${c.id}')">
+      <div class="cd-badge">${String.fromCodePoint(0x31+i)}</div>
+      <div class="cd-num">${c.id}</div>
+      <h3>${c.desc}</h3>
+      <div class="cd-count">${qs.length} câu hỏi</div>
+    </div>`;
+  }).join('');
+}
+
+function startRandom(){
+  const qs = shuffle(ALL_QUESTIONS).slice(0,60);
+  launchQuiz(qs,'random','🎲 Đề ngẫu nhiên 60 câu');
+}
+
+function startChapter(chId){
+  const qs = shuffle(ALL_QUESTIONS.filter(q=>q.ch===chId));
+  const ch = CHAPTERS.find(c=>c.id===chId);
+  launchQuiz(qs,'chapter',`${chId} – ${ch.desc}`);
+}
+
+function launchQuiz(qs,mode,title){
+  currentQuestions = qs;
+  lastQuestions = qs;
+  userAnswers = new Array(qs.length).fill(null);
+  currentIdx = 0;
+  quizMode = mode;
+  document.getElementById('quizTitle').textContent = title;
+  buildDots();
+  renderQuestion(0);
+  show('quiz');
+}
+
+function buildDots(){
+  const el = document.getElementById('qDots');
+  el.innerHTML = currentQuestions.map((_,i)=>`<div class="q-dot" id="dot${i}" onclick="jumpTo(${i})">${i+1}</div>`).join('');
+}
+
+function jumpTo(i){
+  currentIdx=i;
+  renderQuestion(i);
+}
+
+function renderQuestion(i){
+  const q = currentQuestions[i];
+  const answered = userAnswers[i];
+  const letters = ['A','B','C','D'];
+  document.getElementById('quizMeta').textContent = `${i+1}/${currentQuestions.length}`;
+  document.getElementById('progressFill').style.width = `${(i+1)/currentQuestions.length*100}%`;
+  const answeredCount = userAnswers.filter(a=>a!==null).length;
+  document.getElementById('answeredCount').textContent = `Đã trả lời: ${answeredCount}/${currentQuestions.length}`;
+  document.getElementById('prevBtn').disabled = i===0;
+  const isLast = i===currentQuestions.length-1;
+  const nextBtn = document.getElementById('nextBtn');
+  if(isLast){
+    nextBtn.textContent = '📊 Xem kết quả';
+    nextBtn.className='nav-btn primary';
+  } else {
+    nextBtn.textContent = 'Tiếp →';
+    nextBtn.className='nav-btn primary';
+  }
+
+  const optHtml = q.opts.map((o,oi)=>{
+    let cls = 'option';
+    if(answered!==null){
+      cls+=' disabled';
+      if(oi===q.ans) cls+=' correct';
+      else if(oi===answered && answered!==q.ans) cls+=' wrong';
+    } else if(answered===oi) cls+=' selected';
+    return `<div class="${cls}" onclick="selectOpt(${oi})">
+      <div class="opt-letter">${letters[oi]}</div>
+      <div class="opt-text">${o}</div>
+    </div>`;
+  }).join('');
+  
+  document.getElementById('questionArea').innerHTML = `
+    <div class="question-card">
+      <div class="q-num">${q.ch} · Câu ${i+1}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${optHtml}</div>
+    </div>`;
+  updateDots();
+}
+
+function updateDots(){
+  currentQuestions.forEach((_,i)=>{
+    const d = document.getElementById('dot'+i);
+    if(!d) return;
+    d.className = 'q-dot';
+    if(i===currentIdx) d.classList.add('active');
+    else if(userAnswers[i]!==null) d.classList.add('answered');
+  });
+}
+
+function selectOpt(oi){
+  if(userAnswers[currentIdx]!==null) return;
+  userAnswers[currentIdx]=oi;
+  renderQuestion(currentIdx);
+}
+
+function changeQ(dir){
+  const ni = currentIdx+dir;
+  if(ni<0||ni>=currentQuestions.length) return;
+  currentIdx=ni;
+  renderQuestion(ni);
+}
+
+function handleNext(){
+  if(currentIdx===currentQuestions.length-1){
+    showResult();
+  } else {
+    changeQ(1);
+  }
+}
+
+function showResult(){
+  let correct=0;
+  userAnswers.forEach((a,i)=>{ if(a===currentQuestions[i].ans) correct++; });
+  const total=currentQuestions.length;
+  const pct=Math.round(correct/total*100);
+  document.getElementById('resultScore').textContent=pct+'%';
+  let title='',msg='';
+  if(pct>=90){title='🏆 Xuất sắc!';msg='Bạn nắm vững nội dung rất tốt. Tiếp tục phát huy!';}
+  else if(pct>=75){title='👏 Tốt lắm!';msg='Kết quả khá tốt. Ôn lại các câu sai để hoàn thiện hơn.';}
+  else if(pct>=50){title='📚 Cần cố gắng thêm';msg='Bạn cần ôn luyện thêm. Xem lại đáp án phía dưới nhé!';}
+  else{title='💪 Hãy ôn tập lại!';msg='Điểm chưa cao. Hãy học kỹ từng chuyên đề rồi thử lại.';}
+  document.getElementById('resultTitle').textContent=title;
+  document.getElementById('resultMsg').textContent=msg;
+  document.getElementById('r-correct').textContent=correct;
+  document.getElementById('r-wrong').textContent=total-correct;
+  document.getElementById('r-total').textContent=total;
+  buildReview();
+  show('result');
+}
+
+function buildReview(){
+  const list = document.getElementById('reviewList');
+  const letters=['A','B','C','D'];
+  list.innerHTML = currentQuestions.map((q,i)=>{
+    const ua=userAnswers[i];
+    const isCorrect=ua===q.ans;
+    const tag=ua===null?'<span class="tag-wrong">Chưa trả lời</span>':isCorrect?'<span class="tag-correct">Đúng</span>':'<span class="tag-wrong">Sai</span>';
+    const optsHtml=q.opts.map((o,oi)=>{
+      let cls='review-opt normal';
+      if(oi===q.ans) cls='review-opt c-ans';
+      else if(oi===ua&&ua!==q.ans) cls='review-opt w-sel';
+      return `<div class="${cls}"><span class="review-letter">${letters[oi]}</span>${o}</div>`;
+    }).join('');
+    return `<div class="review-item${isCorrect?'':' wrong-q'}">
+      <div class="review-q"><strong>${i+1}.</strong> ${q.q} ${tag}</div>
+      <div class="review-opts">${optsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function retryQuiz(){
+  launchQuiz(shuffle(lastQuestions),quizMode,document.getElementById('quizTitle').textContent);
+}
+
+function goHome(){show('home');}
+
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// init
+buildHome();
+</script>
+</body>
+</html>
